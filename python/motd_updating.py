@@ -18,5 +18,5 @@ try:
         content.write("{0}\n".format(the_post["title"]))
     with open("/tmp/motd.source", 'w') as source:
         source.write("source: reddit.com/r/showerthoughts/{0}\n".format(the_post["id"]))
-except Exception:
-    pass
+except Exception as e:
+    print("Update failed: {0}".format(repr(e)))
