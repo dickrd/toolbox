@@ -1,7 +1,8 @@
 #!/bin/env python3
 # coding=utf-8
-import random, requests
+import os, random, requests
 
+FISH = "/home/dickzhou/.config/fish"
 
 url = "https://www.reddit.com/r/showerthoughts/top.json?sort=top&t=day&limit=50"
 headers = {
@@ -15,9 +16,9 @@ try:
     posts = r.json()
     the_post = posts["data"]["children"][chosen]["data"]
 
-    with open("/etc/motd.content", 'wb') as content:
+    with open(os.path.join(FISH, "motd.content"), 'wb') as content:
         content.write(the_post["title"].encode("utf-8"))
-    with open("/etc/motd.source", 'w') as source:
+    with open(os.path.join(FISH, "motd.source"), 'w') as source:
         source.write("source: reddit.com/r/showerthoughts/{0}\n".format(the_post["id"]))
 except Exception as e:
     print("Update failed: {0}".format(repr(e)))
