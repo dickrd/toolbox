@@ -111,7 +111,7 @@ def _util():
 
         if args.save_location:
             if not os.path.isdir(args.save_location):
-                print("Invalid save location.")
+                print("invalid save location.")
                 return
             print("result file will be saved to: " + args.save_location)
         else:
@@ -137,10 +137,13 @@ def _util():
 
     elif args.action == "convert":
         print("==> init convert...")
-        for path, directories, files in os.walk(args.input_path):
-            print("==> in \"{0}\"".format(path))
-            for file_name in files:
-                convert(file_name)
+        if os.path.isfile(args.input_path):
+            convert(args.input_path)
+        else:
+            for path, directories, files in os.walk(args.input_path):
+                print("==> in \"{0}\"".format(path))
+                for file_name in files:
+                    convert(file_name)
 
     elif args.action == "split":
         print("==> init split...")
