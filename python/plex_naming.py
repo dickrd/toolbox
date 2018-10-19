@@ -57,7 +57,7 @@ def convert(video_path):
     from subprocess import call
 
     video_name, video_extension = os.path.splitext(video_path)
-    if video_extension in ["avi", "mp4"]:
+    if video_extension in [".avi", ".mp4"]:
         print("processing: " + video_path)
         tmp_name = "ptuil_tmp_ffmpeg.mkv"
         process = ["ffmpeg", "-i", video_path, "-codec", "copy", "-hide_banner", "-loglevel", "panic", tmp_name]
@@ -137,7 +137,7 @@ def _util():
 
     elif args.action == "convert":
         print("==> init convert...")
-        if os.path.isfile(args.input_path):
+        if not os.path.isdir(args.input_path):
             convert(args.input_path)
         else:
             for path, directories, files in os.walk(args.input_path):
