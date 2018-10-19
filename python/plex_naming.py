@@ -16,7 +16,7 @@ class TvShow(object):
             self.desired_subtitle = name + " - S{0}E{1}." + subtitle_language + "{2}"
 
 
-    def add(self, path, file_name):
+    def process(self, path, file_name):
 
         # Move to save directory.
         if self.save_location:
@@ -32,70 +32,45 @@ class TvShow(object):
         if not r:
             return
 
-        # If the file is a subtitle file.
+        # If the file is a regular subtitle file.
         if file_name.endswith(".ass") or file_name.endswith(".srt"):
 
-            # Skip if not including subtitle.
+            # Skip if not including regular subtitle.
             if not self.include_subtitle:
                 return
 
-            print("Processing subtitle: " + file_name)
+            print("added subtitle: " + file_name)
             result_file = os.path.join(output_directory, self.desired_subtitle.format(r.group(1), r.group(2), r.group(3)))
 
         # Not a subtitle file.
         else:
-            print("Processing video: " + file_name)
+            print("added video: " + file_name)
             result_file = os.path.join(output_directory, self.desired.format(r.group(1), r.group(2), r.group(3)))
 
         os.rename(original_file, result_file)
         if self.create_link:
-            print("Creating symbolic link to: " + result_file)
             os.symlink(result_file, original_file)
+            print("linked to: " + result_file)
 
 
-def clean_video(directory, audio_languages=None):
-    if audio_languages is None:
-        audio_languages = ["eng"]
-
+def convert(video_path):
     from subprocess import call
-    for path, directories, files in os.walk(directory):
-        print("In: " + path)
-        for file_name in files:
-            if file_name.endswith(".mkv"):
-                print("Processing using mkvproedit: " + file_name)
-                call(["mkvpropedit", os.path.join(path, file_name), "--quiet", "-d", "title"])
-                call(["mkvpropedit", os.path.join(path, file_name), "--quiet", "-e", "track:v1", "-d", "name"])
 
-                for index, item in enumerate(audio_languages, 1):
-                    call(["mkvpropedit", os.path.join(path, file_name), "--quiet", "-e",
-                          "track:a{0}".format(index), "-d", "name"])
-                    call(["mkvpropedit", os.path.join(path, file_name), "--quiet", "-e",
-                          "track:a{0}".format(index), "-s", "language={0}".format(item)])
-
-            elif file_name.endswith(".mp4") or file_name.endswith(".avi"):
-                print("Processing using ffmpeg: " + file_name)
-                tmp_name = "ptuil_tmp_ffmpeg.mp4"
-                process = ["ffmpeg", "-i", os.path.join(path, file_name), "-codec", "copy", "-hide_banner", "-loglevel", "panic",
-                 "-map_metadata", "-1"]
-
-                for index, item in enumerate(audio_languages, 0):
-                    process.append("-metadata:s:a:{0}".format(index))
-                    process.append("language={0}".format(item))
-                process.append(tmp_name)
-                call(process)
-
-                if file_name.endswith(".mp4"):
-                    os.rename(tmp_name, os.path.join(path, file_name))
-                else:
-                    os.rename(tmp_name, os.path.join(path, file_name[:-4] + ".mp4"))
-                    os.remove(os.path.join(path, file_name))
-            else:
-                print("Skip file: " + file_name)
+    video_name, video_extension = os.path.splitext(video_path)
+    if video_extension in ["avi", "mp4"]:
+        print("processing: " + video_path)
+        tmp_name = "ptuil_tmp_ffmpeg.mkv"
+        process = ["ffmpeg", "-i", video_path, "-codec", "copy", "-hide_banner", "-loglevel", "panic", tmp_name]
+        call(process)
+        os.rename(tmp_name, video_name + ".mkv")
+        os.remove(video_path)
+    else:
+        print("skipped file: " + video_path)
 
 
 def split_video(video_path, time, name):
     from subprocess import call
-    print("Splitting video at {0}, to {1} and {2}".format(time, name[0], name[1]))
+    print("splitting video at {0}, to {1} and {2}".format(time, name[0], name[1]))
     call(["ffmpeg", "-i", video_path, "-hide_banner", "-loglevel", "panic",
           "-t", time, "-c", "copy", name[0],
           "-ss", time, "-c", "copy", name[1]])
@@ -107,7 +82,7 @@ def _util():
     # Parse commandline arguments.
     parser = argparse.ArgumentParser(description="util for plex videos.")
     parser.add_argument("action",
-                        help="action to perform, including: rename, clean, split")
+                        help="action to perform, including: rename, convert, split")
     parser.add_argument("-i", "--input-path", default="./",
                         help="path to video and subtitle files")
     parser.add_argument("-n", "--show-name",
@@ -123,60 +98,63 @@ def _util():
                         help="set language")
     parser.add_argument("--time",
                         help="time code to split")
-    parser.add_argument("--result-names", default=None, nargs="2",
+    parser.add_argument("--result-names", default=None, nargs=2,
                         help="set split file names")
 
     args = parser.parse_args()
 
     if args.action == "rename":
+        print("==> init rename...")
         if not args.show_name:
-            print("Name of the show is required (--show-name).")
+            print("name of the show is required (--show-name).")
             return
 
         if args.save_location:
             if not os.path.isdir(args.save_location):
                 print("Invalid save location.")
                 return
-            print("Result file will be saved to: " + args.save_location)
+            print("result file will be saved to: " + args.save_location)
         else:
-            print("Result file will be saved to its original directory.")
+            print("result file will be saved to its original directory.")
 
         if args.create_link:
-            print("Original file structure will remain the same.")
+            print("original file structure will remain the same.")
 
         subtitle_language = "eng"
         if args.include_subtitle:
-            print("Subtitle will be renamed.")
+            print("subtitle will be renamed.")
             if args.language:
                 subtitle_language = args.language[0]
-            print("Set subtitle language to: " + subtitle_language)
+            print("set subtitle language to: " + subtitle_language)
 
         a_show = TvShow(name=args.show_name, save_location=args.save_location,
                         create_link=args.create_link, include_subtitle=args.include_subtitle, subtitle_language=subtitle_language)
 
         for path, directories, files in os.walk(args.input_path):
-            print("In \"{0}\"".format(path))
+            print("==> in \"{0}\"".format(path))
             for file_name in files:
-                a_show.add(path, file_name)
+                a_show.process(path, file_name)
 
-    elif args.action == "clean":
-        if args.language:
-            print("Set audio languages to: {0}".format(args.language))
-
-        clean_video(args.input_path, args.language)
+    elif args.action == "convert":
+        print("==> init convert...")
+        for path, directories, files in os.walk(args.input_path):
+            print("==> in \"{0}\"".format(path))
+            for file_name in files:
+                convert(file_name)
 
     elif args.action == "split":
+        print("==> init split...")
         if not args.time:
-            print("Split time code is required (--time).")
+            print("split time code is required (--time).")
             return
         if not args.result_names:
-            print("Name of the result file is required (--result-names).")
+            print("name of the result file is required (--result-names).")
             return
 
         split_video(args.input_path, args.time, args.result_names)
 
     else:
-        print("Unsupported action: " + args.action)
+        print("unsupported action: " + args.action)
 
 
 if __name__ == '__main__':
