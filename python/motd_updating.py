@@ -4,7 +4,7 @@ import os, random, requests
 
 FISH = "/home/dickzhou/.config/fish"
 
-url = "https://www.reddit.com/r/showerthoughts/top.json?sort=top&t=day&limit=50"
+url = "https://api.hehehey.com/r/showerthoughts/top.json?sort=top&t=day&limit=50"
 headers = {
     "User-Agent": "linux:com.hehehey.toolbox:v1.0 (by /u/DickRD)"
 }
