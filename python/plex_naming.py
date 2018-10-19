@@ -104,7 +104,7 @@ def _util():
     args = parser.parse_args()
 
     if args.action == "rename":
-        print("==> init rename...")
+        print("==> rename...")
         if not args.show_name:
             print("name of the show is required (--show-name).")
             return
@@ -131,22 +131,24 @@ def _util():
                         create_link=args.create_link, include_subtitle=args.include_subtitle, subtitle_language=subtitle_language)
 
         for path, directories, files in os.walk(args.input_path):
-            print("==> in \"{0}\"".format(path))
+            print("--> in \"{0}\"".format(path))
             for file_name in files:
                 a_show.process(path, file_name)
 
     elif args.action == "convert":
-        print("==> init convert...")
-        if not os.path.isdir(args.input_path):
+        print("==> convert...")
+        if os.path.isfile(args.input_path):
             convert(args.input_path)
-        else:
+        elif os.path.isdir(args.input_path):
             for path, directories, files in os.walk(args.input_path):
-                print("==> in \"{0}\"".format(path))
+                print("--> in \"{0}\"".format(path))
                 for file_name in files:
                     convert(file_name)
+        else:
+            print("invalid input path.")
 
     elif args.action == "split":
-        print("==> init split...")
+        print("==> split...")
         if not args.time:
             print("split time code is required (--time).")
             return
