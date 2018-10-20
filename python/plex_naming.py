@@ -57,13 +57,12 @@ def convert(video_path):
     from subprocess import call
 
     video_name, video_extension = os.path.splitext(video_path)
-    if video_extension in [".avi", ".mp4"]:
+    if video_extension in [".avi", ".mp4", ".m4v"]:
         print("processing: " + video_path)
         tmp_name = "ptuil_tmp_ffmpeg.mkv"
         process = ["ffmpeg", "-i", video_path, "-codec", "copy", "-hide_banner", "-loglevel", "panic", tmp_name]
         call(process)
         os.rename(tmp_name, video_name + ".mkv")
-        os.remove(video_path)
     else:
         print("skipped file: " + video_path)
 
@@ -143,7 +142,7 @@ def _util():
             for path, directories, files in os.walk(args.input_path):
                 print("--> in \"{0}\"".format(path))
                 for file_name in files:
-                    convert(file_name)
+                    convert(os.path.join(path, file_name))
         else:
             print("invalid input path.")
 
