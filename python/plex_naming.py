@@ -71,8 +71,8 @@ def split_video(video_path, time, name):
     from subprocess import call
     print("splitting video at {0}, to {1} and {2}".format(time, name[0], name[1]))
     call(["ffmpeg", "-i", video_path, "-hide_banner", "-loglevel", "panic",
-          "-t", time, "-c", "copy", name[0],
-          "-ss", time, "-c", "copy", name[1]])
+          "-t", time, "-c", "copy", "-map", "0", name[0],
+          "-ss", time, "-c", "copy", "-map", "0", name[1]])
 
 
 def _util():
