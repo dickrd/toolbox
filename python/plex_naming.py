@@ -60,7 +60,7 @@ def convert(video_path):
     if video_extension in [".avi", ".mp4", ".m4v"]:
         print("processing: " + video_path)
         tmp_name = "ptuil_tmp_ffmpeg.mkv"
-        process = ["ffmpeg", "-i", video_path, "-codec", "copy", "-hide_banner", "-loglevel", "panic", tmp_name]
+        process = ["ffmpeg", "-i", video_path, "-map", "0", "-codec", "copy", "-hide_banner", "-loglevel", "panic", tmp_name]
         call(process)
         os.rename(tmp_name, video_name + ".mkv")
     else:
