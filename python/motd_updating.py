@@ -19,7 +19,7 @@ try:
     with open(os.path.join(FISH, "motd.content"), 'wb') as content:
         content.write(the_post["title"].encode("utf-8"))
     with open(os.path.join(FISH, "motd.source"), 'w') as source:
-        source.write("source: reddit.com/r/showerthoughts/{0}\n".format(the_post["id"]))
+        source.write("source: reddit.com/r/showerthoughts/comments/{0}\n".format(the_post["id"]))
 except Exception as e:
     print("Update failed: {0}".format(repr(e)))
     exit(1)
