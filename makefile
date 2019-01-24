@@ -2,7 +2,9 @@ BUILD_DIR = out
 INSTALL_DIR = ~/bin
 DEPENDENCIES = structure
 
-.PHONY: install uninstall structure clean
+.PHONY: all install uninstall structure clean
+
+all: motd naming
 
 install: motd naming
 	cp $(BUILD_DIR)/motd $(INSTALL_DIR)/
