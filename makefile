@@ -1,12 +1,11 @@
 BUILD_DIR = out
 INSTALL_DIR = ~/bin
-DEPENDENCIES = structure
 
-.PHONY: all install uninstall structure clean
+.PHONY: all install uninstall clean
 
-all: motd naming
+all: $(BUILD_DIR)/motd $(BUILD_DIR)/naming
 
-install: motd naming
+install: $(BUILD_DIR)/motd $(BUILD_DIR)/naming
 	cp $(BUILD_DIR)/motd $(INSTALL_DIR)/
 	cp $(BUILD_DIR)/naming $(INSTALL_DIR)/
 
@@ -14,16 +13,16 @@ uninstall:
 	rm -rf $(INSTALL_DIR)/motd
 	rm -rf $(INSTALL_DIR)/naming
 
-structure:
-	mkdir -p $(BUILD_DIR)
-
 clean:
 	rm -rf $(BUILD_DIR)
 
-motd: src/py/motd.py $(DEPENDENCIES)
-	cp $< $(BUILD_DIR)/$@
-	chmod +x $(BUILD_DIR)/$@
+$(BUILD_DIR):
+	mkdir $(BUILD_DIR)
 
-naming: src/py/naming.py $(DEPENDENCIES)
-	cp $< $(BUILD_DIR)/$@
-	chmod +x $(BUILD_DIR)/$@
+$(BUILD_DIR)/motd: src/py/motd.py $(BUILD_DIR)
+	cp $< $@
+	chmod +x $@
+
+$(BUILD_DIR)/naming: src/py/naming.py $(BUILD_DIR)
+	cp $< $@
+	chmod +x $@
