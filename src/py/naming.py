@@ -103,7 +103,6 @@ def _util():
     args = parser.parse_args()
 
     if args.action == "rename":
-        print("==> rename...")
         if not args.show_name:
             print("name of the show is required (--show-name).")
             return
@@ -119,6 +118,7 @@ def _util():
         if args.create_link:
             print("original file structure will remain the same.")
 
+        print("==> rename...")
         subtitle_language = "eng"
         if args.include_subtitle:
             print("subtitle will be renamed.")
@@ -147,7 +147,6 @@ def _util():
             print("invalid input path.")
 
     elif args.action == "cut":
-        print("==> cutting...")
         if not args.time:
             print("cut time code is required (--time).")
             return
@@ -155,6 +154,7 @@ def _util():
             print("name of the result file is required (--result-names).")
             return
 
+        print("==> cutting...")
         cut_video(args.input_path, args.time, args.result_names)
 
     else:
