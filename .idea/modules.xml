@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/toolbox.iml" filepath="$PROJECT_DIR$/toolbox.iml" />
+      <module fileurl="file://$PROJECT_DIR$/src/py/py.iml" filepath="$PROJECT_DIR$/src/py/py.iml" />
     </modules>
   </component>
 </project>
