@@ -59,7 +59,7 @@ def convert(video_path):
     video_name, video_extension = os.path.splitext(video_path)
     if video_extension in [".avi", ".mp4", ".m4v"]:
         print(video_path)
-        tmp_name = "ptuil_tmp_ffmpeg.mkv"
+        tmp_name = "naming_tmp_ffmpeg.mkv"
         process = ["ffmpeg", "-i", video_path, "-map", "0", "-codec", "copy", "-hide_banner", "-loglevel", "panic", tmp_name]
         call(process)
         os.rename(tmp_name, video_name + ".mkv")
@@ -67,9 +67,9 @@ def convert(video_path):
         print("skipped file: " + video_path)
 
 
-def split_video(video_path, time, name):
+def cut_video(video_path, time, name):
     from subprocess import call
-    print("video splitting at {0}:\n  * {1}\n  * {2}".format(time, name[0], name[1]))
+    print("video cut at {0}:\n  * {1}\n  * {2}".format(time, name[0], name[1]))
     call(["ffmpeg", "-i", video_path, "-hide_banner", "-loglevel", "panic",
           "-t", time, "-c", "copy", "-map", "0", name[0],
           "-ss", time, "-c", "copy", "-map", "0", name[1]])
@@ -79,9 +79,9 @@ def _util():
     import argparse
 
     # Parse commandline arguments.
-    parser = argparse.ArgumentParser(description="util for plex videos.")
-    parser.add_argument("action",
-                        help="action to perform, including: rename, convert, split")
+    parser = argparse.ArgumentParser(description="util for managing videos.")
+    parser.add_argument("action", choices=["rename", "convert", "cut"],
+                        help="action to perform")
     parser.add_argument("-i", "--input-path", default="./",
                         help="path to video and subtitle files")
     parser.add_argument("-n", "--show-name",
@@ -146,16 +146,16 @@ def _util():
         else:
             print("invalid input path.")
 
-    elif args.action == "split":
-        print("==> split...")
+    elif args.action == "cut":
+        print("==> cutting...")
         if not args.time:
-            print("split time code is required (--time).")
+            print("cut time code is required (--time).")
             return
         if not args.result_names:
             print("name of the result file is required (--result-names).")
             return
 
-        split_video(args.input_path, args.time, args.result_names)
+        cut_video(args.input_path, args.time, args.result_names)
 
     else:
         print("unsupported action: " + args.action)
