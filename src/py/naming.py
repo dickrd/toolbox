@@ -15,7 +15,6 @@ class TvShow(object):
         if self.include_subtitle:
             self.desired_subtitle = name + " - S{0}E{1}." + subtitle_language + "{2}"
 
-
     def process(self, path, file_name):
 
         # move to save directory.
@@ -40,7 +39,8 @@ class TvShow(object):
                 return
 
             print("added subtitle: " + file_name)
-            result_file = os.path.join(output_directory, self.desired_subtitle.format(r.group(1), r.group(2), r.group(3)))
+            result_file = os.path.join(output_directory,
+                                       self.desired_subtitle.format(r.group(1), r.group(2), r.group(3)))
 
         # not a subtitle file.
         else:
@@ -60,7 +60,8 @@ def convert(video_path):
     if video_extension in [".avi", ".mp4", ".m4v"]:
         print(video_path)
         tmp_name = "naming_tmp_ffmpeg.mkv"
-        process = ["ffmpeg", "-i", video_path, "-map", "0", "-codec", "copy", "-hide_banner", "-loglevel", "panic", tmp_name]
+        process = ["ffmpeg", "-i", video_path, "-map", "0", "-codec", "copy", "-hide_banner", "-loglevel", "panic",
+                   tmp_name]
         call(process)
         os.rename(tmp_name, video_name + ".mkv")
     else:
@@ -127,7 +128,8 @@ def _util():
             print("set subtitle language to: " + subtitle_language)
 
         a_show = TvShow(name=args.show_name, save_location=args.save_location,
-                        create_link=args.create_link, include_subtitle=args.include_subtitle, subtitle_language=subtitle_language)
+                        create_link=args.create_link, include_subtitle=args.include_subtitle,
+                        subtitle_language=subtitle_language)
 
         for path, directories, files in os.walk(args.input_path):
             print("--> in \"{0}\"".format(path))

@@ -1,6 +1,8 @@
 #!/bin/env python
 # coding=utf-8
-import os, random, requests
+import os
+import random
+import requests
 
 FISH = "/home/dickzhou/.config/fish"
 
